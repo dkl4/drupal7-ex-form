@@ -174,3 +174,53 @@ function form_example_tutorial_4($form, &$form_state) {
   );
   return $form;
 }
+
+
+
+//////////////// Tutorial Example 5 //////////////////////
+
+/**
+ * Example 5: Basic form with additional element attributes.
+ *
+ * This demonstrates additional attributes of text form fields.
+ *
+ * For a more extensive example on element types
+ * @see http://drupal.org/node/751826
+ *
+ * See the @link http://api.drupal.org/api/file/developer/topics/forms_api.html complete form reference @endlink
+ *
+ * @ingroup form_example
+ */
+function form_example_tutorial_5($form, &$form_state) {
+  $form['description'] = array(
+    '#type'        => 'item',
+    '#title'       => t('A form with additional attributes'),
+    '#description' => t('This one adds #default_value and #description'),   // Added
+  );
+  $form['name'] = array(
+    '#type'        => 'fieldset',
+    '#title'       => t('Name'),
+    '#collapsible' => TRUE,
+    '#collapsed'   => FALSE,
+  );
+
+  $form['name']['first'] = array(
+    '#type'          => 'textfield',
+    '#title'         => t('First name'),
+    '#required'      => TRUE,
+    '#default_value' => "First name",                    // added default value.
+    '#description'   => "Please enter your first name.", // added description
+    '#size'          => 20,                              // added
+    '#maxlength'     => 20,                              // added
+  );
+  $form['name']['last'] = array(
+    '#type'     => 'textfield',
+    '#title'    => t('Last name'),
+    '#required' => TRUE,
+  );
+  $form['submit'] = array(
+    '#type'  => 'submit',
+    '#value' => 'Submit',
+  );
+  return $form;
+}
