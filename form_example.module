@@ -88,13 +88,13 @@ function form_example_menu() {
     'file'            => 'form_example_tutorial.inc',
   );
   $items['examples/form_example/tutorial/6'] = array(
-    'title' => '#6',
-    'page callback' => 'drupal_get_form',
-    'page arguments' => array('form_example_tutorial_6'),
+    'title'           => '#6',
+    'page callback'   => 'drupal_get_form',
+    'page arguments'  => array('form_example_tutorial_6'),
     'access callback' => TRUE,
-    'description' => 'Tutorial 6: Form with a validate handler',
-    'type' => MENU_LOCAL_TASK,
-    'file' => 'form_example_tutorial.inc',
+    'description'     => 'Tutorial 6: Form with a validate handler',
+    'type'            => MENU_LOCAL_TASK,
+    'file'            => 'form_example_tutorial.inc',
   );
   $items['examples/form_example/tutorial/7'] = array(
     'title' => '#7',

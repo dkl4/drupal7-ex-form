@@ -224,3 +224,76 @@ function form_example_tutorial_5($form, &$form_state) {
   );
   return $form;
 }
+
+
+//////////////// Tutorial Example 6 //////////////////////
+
+/**
+ * Example 6: A basic form with a validate handler.
+ *
+ * From http://drupal.org/node/717736
+ * @see form_example_tutorial_6_validate()
+ */
+function form_example_tutorial_6($form, &$form_state) {
+  $form['description'] = array(
+    '#type' => 'item',
+    '#title' => t('A form with a validation handler'),
+  );
+
+  $form['name'] = array(
+    '#type'        => 'fieldset',
+    '#title'       => t('Name'),
+    '#collapsible' => TRUE,
+    '#collapsed'   => FALSE,
+  );
+  $form['name']['first'] = array(
+    '#type'          => 'textfield',
+    '#title'         => t('First name'),
+    '#required'      => TRUE,
+    '#default_value' => "First name",
+    '#description'   => "Please enter your first name.",
+    '#size'          => 20,
+    '#maxlength'     => 20,
+  );
+  $form['name']['last'] = array(
+    '#type'     => 'textfield',
+    '#title'    => t('Last name'),
+    '#required' => TRUE,
+  );
+
+  // New form field added to permit entry of year of birth.
+  // The data entered into this field will be validated with
+  // the default validation function which is named form_example_tutorial_6_VALIDATE
+  $form['year_of_birth'] = array(
+    '#type'        => 'textfield',
+    '#title'       => "Year of birth",
+    '#description' => 'Format is "YYYY"',
+  );
+
+  $form['submit'] = array(
+    '#type'  => 'submit',
+    '#value' => 'Submit',
+  );
+  return $form;
+}
+
+
+/**
+ * Now we add a handler/function to validate the data entered into the
+ * "year of birth" field to make sure it's between the values of 1900
+ * and 2000. If not, it displays an error. The value report is
+ * $form_state['values'] (see http://drupal.org/node/144132#form-state).
+ *
+ * Notice the name of the function. It is simply the name of the form
+ * followed by '_validate'. This is always the name of the default validation
+ * function. An alternate LIST of validation functionS could have been provided
+ * in $form['#validate'].
+ *
+ * @see form_example_tutorial_6()
+ */
+function form_example_tutorial_6_validate($form, &$form_state) {
+  $year_of_birth = $form_state['values']['year_of_birth'];
+  if ($year_of_birth && ($year_of_birth < 1900 || $year_of_birth > 2000)) {
+    form_set_error('year_of_birth', t('Enter a year between 1900 and 2000.'));
+  }
+}
