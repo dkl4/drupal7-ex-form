@@ -97,13 +97,13 @@ function form_example_menu() {
     'file'            => 'form_example_tutorial.inc',
   );
   $items['examples/form_example/tutorial/7'] = array(
-    'title' => '#7',
-    'page callback' => 'drupal_get_form',
-    'page arguments' => array('form_example_tutorial_7'),
+    'title'           => '#7',
+    'page callback'   => 'drupal_get_form',
+    'page arguments'  => array('form_example_tutorial_7'),
     'access callback' => TRUE,
-    'description' => 'Tutorial 7: Form with a submit handler',
-    'type' => MENU_LOCAL_TASK,
-    'file' => 'form_example_tutorial.inc',
+    'description'     => 'Tutorial 7: Form with a submit handler',
+    'type'            => MENU_LOCAL_TASK,
+    'file'            => 'form_example_tutorial.inc',
   );
   $items['examples/form_example/tutorial/8'] = array(
     'title' => '#8',
