@@ -48,13 +48,43 @@ function form_example_tutorial() {
 function form_example_tutorial_1($form, &$form_state) {
 
   $form['description'] = array(
-    '#type' => 'item',
+    '#type'  => 'item',
     '#title' => t('A form with nothing but a textfield'),
   );
   // This is the first form element. It's a textfield with a label, "Name"
   $form['name'] = array(
-    '#type' => 'textfield',
+    '#type'  => 'textfield',
     '#title' => t('Name'),
+  );
+  return $form;
+}
+
+
+
+//////////////// Tutorial Example 2 //////////////////////
+
+/**
+ * This is Example 2, a basic form with a submit button.
+ *
+ * @see http://drupal.org/node/717726
+ * @ingroup form_example
+ */
+function form_example_tutorial_2($form, &$form_state) {
+  $form['description'] = array(
+    '#type'  => 'item',
+    '#title' => t('A simple form with a submit button'),
+  );
+
+  $form['name'] = array(
+    '#type'  => 'textfield',
+    '#title' => t('Name'),
+  );
+
+  // Adds a simple submit button that refreshes the form and clears its
+  // contents. This is the default behavior for forms.
+  $form['submit'] = array(
+    '#type'  => 'submit',
+    '#value' => 'Submit',
   );
   return $form;
 }
