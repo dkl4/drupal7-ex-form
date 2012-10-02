@@ -161,3 +161,32 @@ function form_example_menu() {
 
   return $items;
 }
+
+
+
+/**
+ * Page callback for our general info page.
+ */
+function form_example_intro() {
+  $markup = t('The form example module provides a tutorial, extensible multistep example, an element example, and a #states example');
+  return array('#markup' => $markup);
+}
+
+
+/**
+ * Implements hook_help().
+ */
+function form_example_help($path, $arg) {
+  switch ($path) {
+    case 'examples/form_example/tutorial':
+      // TODO: Update the URL.
+      $help = t('This form example tutorial for Drupal 7 is the code from the <a href="http://drupal.org/node/262422">Handbook 10-step tutorial</a>');
+      break;
+    case 'examples/form_example/element_example':
+      $help = t('The Element Example shows how modules can provide their own Form API element types. Four different element types are demonstrated.');
+      break;
+  }
+  if (!empty($help)) {
+    return '<p>' . $help . '</p>';
+  }
+}
