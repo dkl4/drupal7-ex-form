@@ -61,13 +61,13 @@ function form_example_menu() {
     'file'            => 'form_example_tutorial.inc',
   );
   $items['examples/form_example/tutorial/3'] = array(
-    'title' => '#3',
-    'page callback' => 'drupal_get_form',
-    'page arguments' => array('form_example_tutorial_3'),
+    'title'           => '#3',
+    'page callback'   => 'drupal_get_form',
+    'page arguments'  => array('form_example_tutorial_3'),
     'access callback' => TRUE,
-    'description' => 'Tutorial 3: Fieldsets',
-    'type' => MENU_LOCAL_TASK,
-    'file' => 'form_example_tutorial.inc',
+    'description'     => 'Tutorial 3: Fieldsets',
+    'type'            => MENU_LOCAL_TASK,
+    'file'            => 'form_example_tutorial.inc',
   );
   $items['examples/form_example/tutorial/4'] = array(
     'title' => '#4',

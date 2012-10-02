@@ -88,3 +88,46 @@ function form_example_tutorial_2($form, &$form_state) {
   );
   return $form;
 }
+
+
+//////////////// Tutorial Example 3 //////////////////////
+
+/**
+ * Example 3: A basic form with fieldsets.
+ *
+ * We establish a fieldset element and then place two text fields within
+ * it, one for a first name and one for a last name. This helps us group
+ * related content.
+ *
+ * Study the code below and you'll notice that we renamed the array of the first
+ * and last name fields by placing them under the $form['name']
+ * array. This tells Form API these fields belong to the $form['name'] fieldset.
+ *
+ * @ingroup form_example
+ */
+function form_example_tutorial_3($form, &$form_state) {
+  $form['description'] = array(
+    '#type'  => 'item',
+    '#title' => t('A form with a fieldset'),  // This is the title of the form.
+  );
+
+  $form['name'] = array(
+    '#type'  => 'fieldset',
+    '#title' => t('Name'),     // The fieldset 'title' has larger font size than the form element label
+  );
+  $form['name']['first'] = array(
+    '#type'  => 'textfield',
+    '#title' => t('First name'),   // This is more of a 'label' than a 'title'
+  );
+  $form['name']['last'] = array(
+    '#type'  => 'textfield',
+    '#title' => t('Last name'),
+  );
+
+
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => 'Submit',
+  );
+  return $form;
+}
