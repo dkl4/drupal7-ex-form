@@ -112,7 +112,7 @@ function form_example_tutorial_3($form, &$form_state) {
   );
 
   $form['name'] = array(
-    '#type'  => 'fieldset',
+    '#type'  => 'fieldset',    // A fieldset 'title' gets class="fieldset-legend"
     '#title' => t('Name'),     // The fieldset 'title' has larger font size than the form element label
   );
   $form['name']['first'] = array(
@@ -127,6 +127,49 @@ function form_example_tutorial_3($form, &$form_state) {
 
   $form['submit'] = array(
     '#type' => 'submit',
+    '#value' => 'Submit',
+  );
+  return $form;
+}
+
+
+
+//////////////// Tutorial Example 4 //////////////////////
+
+/**
+ * Example 4: Basic form with required fields.
+ *
+ * @ingroup form_example
+ */
+function form_example_tutorial_4($form, &$form_state) {
+  $form['description'] = array(
+    '#type'  => 'item',
+    '#title' => t('A form with validation'),
+  );
+
+  $form['name'] = array(
+    '#type'        => 'fieldset',
+    '#title'       => t('Name'),
+    // Make the fieldset collapsible.
+    // To collapse, click on the fieldset label 'Name'.
+    '#collapsible' => TRUE, // Added
+    '#collapsed'   => FALSE,  // Added
+  );
+
+  // Make these fields required.
+  $form['name']['first'] = array(
+    '#type'     => 'textfield',
+    '#title'    => t('First name'),
+    '#required' => TRUE,           // Added from tutorial_3
+  );
+  $form['name']['last'] = array(
+    '#type'     => 'textfield',
+    '#title'    => t('Last name'),
+    '#required' => TRUE,          // Added from tutorial_3
+  );
+
+  $form['submit'] = array(
+    '#type'  => 'submit',
     '#value' => 'Submit',
   );
   return $form;

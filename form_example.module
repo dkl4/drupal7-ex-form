@@ -71,12 +71,12 @@ function form_example_menu() {
   );
   $items['examples/form_example/tutorial/4'] = array(
     'title' => '#4',
-    'page callback' => 'drupal_get_form',
-    'page arguments' => array('form_example_tutorial_4'),
+    'page callback'   => 'drupal_get_form',
+    'page arguments'  => array('form_example_tutorial_4'),
     'access callback' => TRUE,
-    'description' => 'Tutorial 4: Required fields',
-    'type' => MENU_LOCAL_TASK,
-    'file' => 'form_example_tutorial.inc',
+    'description'     => 'Tutorial 4: Required fields',
+    'type'            => MENU_LOCAL_TASK,
+    'file'            => 'form_example_tutorial.inc',
   );
   $items['examples/form_example/tutorial/5'] = array(
     'title' => '#5',
