@@ -1,8 +1,8 @@
-2012-09-17
+2012-10-02
 
 From Drupal 7 examples at http://drupal.org/project/examples
 
-This is the _example.
+This is the form_example.
 
 This offers two potential improvements :
 
