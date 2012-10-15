@@ -370,3 +370,105 @@ function form_example_tutorial_7_submit($form, &$form_state) {
   drupal_set_message(t('The form has been submitted. name="@first @last", year of birth=@year_of_birth',
     array('@first' => $form_state['values']['first'], '@last' => $form_state['values']['last'], '@year_of_birth' => $form_state['values']['year_of_birth'])));
 }
+
+
+//////////////// Tutorial Example 8 //////////////////////
+
+/**
+ * Example 8: A simple multistep form with a Next and a Back button.
+ *
+ * Handbook page: http://drupal.org/node/717750.
+ *
+ * For more extensive multistep forms, see
+ * @link form_example_wizard.inc form_example_wizard.inc @endlink
+ *
+ *
+ * Adds logic to our form builder to give it two pages.
+ * The @link ajax_example_wizard AJAX Example's Wizard Example @endlink
+ * gives an AJAX version of this same idea.
+ *
+ * @see form_example_tutorial_8_page_two()
+ * @see form_example_tutorial_8_page_two_back()
+ * @see form_example_tutorial_8_page_two_submit()
+ * @see form_example_tutorial_8_next_submit()
+ * @see form_example_tutorial.inc
+ * @ingroup form_example
+ */
+function form_example_tutorial_8($form, &$form_state) {
+
+  // Display page 2 if $form_state['page_num'] == 2
+  if (!empty($form_state['page_num']) && $form_state['page_num'] == 2) {
+    return form_example_tutorial_8_page_two($form, $form_state);
+  }
+
+  // Otherwise we build page 1.
+  $form_state['page_num'] = 1;
+
+  $form['description'] = array(
+    '#type'  => 'item',
+    '#title' => t('A basic multistep form (page 1)'),
+  );
+
+  $form['first'] = array(
+    '#type'          => 'textfield',
+    '#title'         => t('First name'),
+    '#description'   => "Please enter your first name.",
+    '#size'          => 20,
+    '#maxlength'     => 20,
+    '#required'      => TRUE,
+    '#default_value' => !empty($form_state['values']['first']) ? $form_state['values']['first'] : '',
+  );
+  $form['last'] = array(
+    '#type'          => 'textfield',
+    '#title'         => t('Last name'),
+    '#default_value' => !empty($form_state['values']['last']) ? $form_state['values']['last'] : '',
+  );
+  $form['year_of_birth'] = array(
+    '#type'          => 'textfield',
+    '#title'         => "Year of birth",
+    '#description'   => 'Format is "YYYY"',
+    '#default_value' => !empty($form_state['values']['year_of_birth']) ? $form_state['values']['year_of_birth'] : '',
+  );
+  $form['next'] = array(
+    '#type'     => 'submit',
+    '#value'    => 'Next >>',
+    '#submit'   => array('form_example_tutorial_8_next_submit'),
+    '#validate' => array('form_example_tutorial_8_next_validate'),
+  );
+  return $form;
+}
+
+
+/**
+ * Validate handler for the next button on first page.
+ */
+function form_example_tutorial_8_next_validate($form, &$form_state) {
+  $year_of_birth = $form_state['values']['year_of_birth'];
+  if ($year_of_birth && ($year_of_birth < 1900 || $year_of_birth > 2000)) {
+    form_set_error('year_of_birth', t('Enter a year between 1900 and 2000.'));
+  }
+}
+
+
+/**
+ * Submit handler for form_example_tutorial_8() next button.
+ *
+ * Capture the values from page one and store them away so they can be used
+ * at final submit time.
+ */
+function form_example_tutorial_8_next_submit($form, &$form_state) {
+
+  // Values are saved for each page.
+  // to carry forward to subsequent pages in the form.
+  // and we tell FAPI to rebuild the form.
+  $form_state['page_values'][1] = $form_state['values'];
+
+  if (!empty($form_state['page_values'][2])) {
+    $form_state['values'] = $form_state['page_values'][2];
+  }
+
+  // When form rebuilds, it will look at this to figure which page to build.
+  $form_state['page_num'] = 2;
+  $form_state['rebuild']  = TRUE;
+}
+
