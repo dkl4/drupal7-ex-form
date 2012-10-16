@@ -191,13 +191,15 @@ function form_example_states_form($form, &$form_state) {
     ),
   );
 
+  //This doesn't see to appear even when filling in both elements.  Doesn't appear
+  // in Firefox nor Chrome
   $form['undergraduate']['thanks'] = array(
     '#type'        => 'item',
     '#description' => t('Thanks for providing both your school and your country.'),
     '#states'      => array(
       // Here visibility requires that two separate conditions be true.
       'visible' => array(
-        'input[name="school_country"]' => array('value' => t('Other')),
+        'input[name="school_country"]'  => array('value' => t('Other')),
         'input[name="country_writein"]' => array('filled' => TRUE),
       ),
     ),
@@ -214,6 +216,58 @@ function form_example_states_form($form, &$form_state) {
     ),
   );
 
+
+   // Graduate student information.
+  $form['graduate'] = array(
+    '#type'  => 'fieldset',
+    '#title' => t('Graduate School Information'),
+    // This #states rule says that the "graduate" fieldset should only
+    // be shown if the "student_type" form element is set to "Graduate".
+    '#states' => array(
+      'visible' => array(
+        ':input[name="student_type"]' => array('value' => 'graduate'),
+      ),
+    ),
+  );
+  $form['graduate']['more_info'] = array(
+    '#type'  => 'textarea',
+    '#title' => t('Please describe your graduate studies'),
+  );
+
+  $form['graduate']['info_provide'] = array(
+    '#type'     => 'checkbox',
+    '#title'    => t('Check here if you have provided information above'),
+    '#disabled' => TRUE,
+    '#states'   => array(
+      // Mark this checkbox checked if the "more_info" textarea has something
+      // in it, if it's 'filled'.
+      'checked' => array(      // Action to take: check the checkbox.
+        ':input[name="more_info"]' => array('filled' => TRUE),
+      ),
+    ),
+  );
+
+  $form['expand_more_info'] = array(
+    '#type'  => 'checkbox',
+    '#title' => t('Check here if you want to add more information.'),
+  );
+  $form['more_info'] = array(
+    '#type'        => 'fieldset',
+    '#title'       => t('Additional Information'),
+    '#collapsible' => TRUE,
+    '#collapsed'   => TRUE,
+
+    // Expand the expand_more_info fieldset if the box is checked.
+    '#states' => array(
+      'expanded' => array(
+        ':input[name="expand_more_info"]' => array('checked' => TRUE),
+      ),
+    ),
+  );
+  $form['more_info']['feedback'] = array(
+    '#type'  => 'textarea',
+    '#title' => t('What do you have to say?'),
+  );
 
 
 
