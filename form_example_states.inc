@@ -130,6 +130,93 @@ function form_example_states_form($form, &$form_state) {
   );
 
 
+  // Undergrad information.
+  $form['undergraduate'] = array(
+    '#type'  => 'fieldset',
+    '#title' => t('Undergraduate Information'),
+    // This #states rule says that the "undergraduate" fieldset should only
+    // be shown if the "student_type" form element is set to "Undergraduate".
+    '#states' => array(
+      'visible' => array(
+        ':input[name="student_type"]' => array('value' => 'undergraduate'),
+      ),
+    ),
+  );
+
+  $form['undergraduate']['how_many_years'] = array(
+    '#type'  => 'select',
+    '#title' => t('How many years have you completed?'),
+    // The options here are integers, but since all the action here happens
+    // using the DOM on the client, we will have to use strings to work with
+    // them.
+    '#options' => array(
+      1 => t('One'),
+      2 => t('Two'),
+      3 => t('Three'),
+      4 => t('Four'),
+      5 => t('Lots'),
+    ),
+  );
+
+  $form['undergraduate']['comment'] = array(
+    '#type'        => 'item',
+    '#description' => t("Wow, that's a long time."),
+    '#states'      => array(
+      'visible' => array(
+        // Note that '5' must be used here instead of the integer 5.
+        // The information is coming from the DOM as a string.
+        ':input[name="how_many_years"]' => array('value' => '5'),
+      ),
+    ),
+  );
+  $form['undergraduate']['school_name'] = array(
+    '#type'  => 'textfield',
+    '#title' => t('Your college or university:'),
+  );
+  $form['undergraduate']['school_country'] = array(
+    '#type'    => 'select',
+    '#options' => drupal_map_assoc(array(t('UK'), t('Other'))),
+    '#title'   => t('In what country is your college or university located?'),
+  );
+  $form['undergraduate']['country_writein'] = array(
+    '#type'  => 'textfield',
+    '#size'  => 20,
+    '#title' => t('Please enter the name of the country where your college or university is located.'),
+
+    // Only show this field if school_country is set to 'Other'.
+    '#states' => array(
+      'visible' => array(  // Action to take: Make visible.
+        ':input[name="school_country"]' => array('value' => t('Other')),
+      ),
+    ),
+  );
+
+  $form['undergraduate']['thanks'] = array(
+    '#type'        => 'item',
+    '#description' => t('Thanks for providing both your school and your country.'),
+    '#states'      => array(
+      // Here visibility requires that two separate conditions be true.
+      'visible' => array(
+        'input[name="school_country"]' => array('value' => t('Other')),
+        'input[name="country_writein"]' => array('filled' => TRUE),
+      ),
+    ),
+  );
+  $form['undergraduate']['go_away'] = array(
+    '#type'   => 'submit',
+    '#value'  => t('Done with form'),
+    '#states' => array(
+      // Here visibility requires that two separate conditions be true.
+      'visible' => array(
+        'input[name="school_country"]' => array('value' => t('Other')),
+        'input[name="country_writein"]' => array('filled' => TRUE),
+      ),
+    ),
+  );
+
+
+
+
     $form['submit'] = array(
     '#type' => 'submit',
     '#value' => t('Submit your information'),
