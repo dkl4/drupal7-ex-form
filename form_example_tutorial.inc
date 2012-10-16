@@ -440,6 +440,40 @@ function form_example_tutorial_8($form, &$form_state) {
 
 
 /**
+ * Returns the form for the second page of form_example_tutorial_8().
+ */
+function form_example_tutorial_8_page_two($form, &$form_state) {
+  $form['description'] = array(
+    '#type'  => 'item',
+    '#title' => t('A basic multistep form (page 2)'),
+  );
+
+  $form['color'] = array(
+    '#type'          => 'textfield',
+    '#title'         => t('Favorite color'),
+    '#required'      => TRUE,
+    '#default_value' => !empty($form_state['values']['color']) ? $form_state['values']['color'] : '',
+  );
+  $form['submit'] = array(
+    '#type'   => 'submit',
+    '#value'  => t('Submit'),
+    '#submit' => array('form_example_tutorial_8_page_two_submit'),
+  );
+  $form['back'] = array(
+    '#type'   => 'submit',
+    '#value'  => t('<< Back'),
+    '#submit' => array('form_example_tutorial_8_page_two_back'),
+    // We won't bother validating the required 'color' field, since they
+    // have to come back to this page to submit anyway.
+    // This #limit_validation_errors means that in the submit handler form_example_tutorial_8_page_two_back()
+    // below, we throw away any data we may have picked up on page 2.
+    '#limit_validation_errors' => array(),
+  );
+  return $form;
+}
+
+
+/**
  * Validate handler for the next button on first page.
  */
 function form_example_tutorial_8_next_validate($form, &$form_state) {
@@ -472,3 +506,59 @@ function form_example_tutorial_8_next_submit($form, &$form_state) {
   $form_state['rebuild']  = TRUE;
 }
 
+
+/**
+ * Back button handler submit handler.
+ *
+ * Since #limit_validation_errors = array() is set in form_example_tutorial_8_page_two() above,
+ * values from page 2 will be discarded. We load the page 1 values instead.
+ */
+function form_example_tutorial_8_page_two_back($form, &$form_state) {
+  $form_state['values']   = $form_state['page_values'][1];
+  $form_state['page_num'] = 1;
+  $form_state['rebuild']  = TRUE;
+}
+
+
+/**
+ * The page 2 submit handler.
+ *
+ * This is the final submit handler. Gather all the data together and output
+ * it in a drupal_set_message().
+ */
+function form_example_tutorial_8_page_two_submit($form, &$form_state) {
+  // Normally, some code would go here to alter the database with the data
+  // collected from the form. Instead sets a message with drupal_set_message()
+  // to validate that the code worked.
+  $page_one_values = $form_state['page_values'][1];
+  drupal_set_message(t('The form has been submitted. name="@first @last", year of birth=@year_of_birth',
+  array('@first' => $page_one_values['first'], '@last' => $page_one_values['last'], '@year_of_birth' => $page_one_values['year_of_birth'])));
+
+  if (!empty($page_one_values['first2'])) {
+    drupal_set_message(t('Second name: name="@first @last", year of birth=@year_of_birth',
+    array('@first' => $page_one_values['first2'], '@last' => $page_one_values['last2'], '@year_of_birth' => $page_one_values['year_of_birth2'])));
+  }
+  drupal_set_message(t('And the favorite color is @color', array('@color' => $form_state['values']['color'])));
+
+  // If we wanted to redirect on submission, set $form_state['redirect']. For
+  // simple redirects, the value can be a string of the path to redirect to. For
+  // example, to redirect to /node, one would specify the following:
+  //
+  // $form_state['redirect'] = 'node';
+  //
+  // For more complex redirects, this value can be set to an array of options to
+  // pass to drupal_goto(). For example, to redirect to /foo?bar=1#baz, one
+  // would specify the following:
+  //
+  // $form_state['redirect'] = array(
+  //   'foo',
+  //   array(
+  //     'query' => array('bar' => 1),
+  //     'fragment' => 'baz',
+  //   ),
+  // );
+  //
+  // The first element in the array is the path to redirect to, and the second
+  // element in the array is the array of options. For more information on the
+  // available options, see http://api.drupal.org/url.
+}
