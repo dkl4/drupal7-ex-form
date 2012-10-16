@@ -56,6 +56,8 @@
  * See also @link http://api.drupal.org/api/drupal/developer--topics--forms_api_reference.html/7#states Form API Reference @endlink
  */
 function form_example_states_form($form, &$form_state) {
+  // Note this "name='student_type'" is crucial below to determine which items to reveal
+  // for each given student type.
   $form['student_type'] = array(
     '#type' => 'radios',
     '#options' => array(
@@ -64,6 +66,67 @@ function form_example_states_form($form, &$form_state) {
       'graduate'      => t('Graduate'),
     ),
     '#title' => t('What type of student are you?')
+  );
+
+  // These form elements will pop up when the user identifies themselves as a high school student
+  // These form elements show up in a JavaScript way with no page reload.
+  // Note these elements are there in the original page load.  All we do is reveal them
+  // when we click the "I'm a high school student" button.
+    $form['high_school'] = array(
+    '#type'   => 'fieldset',
+    '#title'  => t('High School Information'),
+    // This #states rule says that the "high school" fieldset should only
+    // be shown if the "student_type" form element is set to "High School".
+    '#states' => array(
+      'visible' => array(
+        ':input[name="student_type"]' => array('value' => 'high_school'),
+      ),
+    ),
+  );
+
+  // High school information.
+  $form['high_school']['tests_taken'] = array(
+    '#type'    => 'checkboxes',
+    '#options' => drupal_map_assoc(array(t('SAT'), t('ACT'))),
+    '#title'   => t('What standardized tests did you take?'),
+    // This #states rule says that this checkboxes array will be visible only
+    // when $form['student_type'] is set to t('High School').
+    // It uses the jQuery selector :input[name=student_type] to choose the
+    // element which triggers the behavior, and then defines the "High School"
+    // value as the one that triggers visibility.
+    '#states'  => array(
+      'visible' => array(   // action to take.
+        ':input[name="student_type"]' => array('value' => 'high_school'),
+      ),
+    ),
+  );
+
+  // The relevant (preloaded) form element HTML is :
+  //  <input id="edit-tests-taken-sat" class="form-checkbox" type="checkbox" value="SAT" name="tests_taken[SAT]">
+  $form['high_school']['sat_score'] = array(
+    '#type'  => 'textfield',
+    '#title' => t('Your SAT score:'),
+    '#size'  => 4,
+
+    // This #states rule limits visibility to when the $form['tests_taken']
+    // 'SAT' checkbox is checked."
+    '#states' => array(
+      'visible' => array(  // action to take.
+        ':input[name="tests_taken[SAT]"]' => array('checked' => TRUE),
+      ),
+    ),
+  );
+  $form['high_school']['act_score'] = array(
+    '#type'  => 'textfield',
+    '#title' => t('Your ACT score:'),
+    '#size'  => 4,
+
+    // Set this element visible if the ACT checkbox above is checked.
+    '#states' => array(
+      'visible' => array(  // action to take.
+        ':input[name="tests_taken[ACT]"]' => array('checked' => TRUE),
+      ),
+    ),
   );
 
 
