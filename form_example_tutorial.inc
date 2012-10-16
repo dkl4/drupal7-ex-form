@@ -717,3 +717,78 @@ function form_example_tutorial_9_submit($form, &$form_state) {
   }
   drupal_set_message($output);
 }
+
+
+//////////////// Tutorial Example 10 //////////////////////
+
+/**
+ * Example 10: A form with a file upload field.
+ *
+ * This example allows the user to upload a file to Drupal which is stored
+ * physically and with a reference in the database.
+ *
+ * @see form_example_tutorial_10_submit()
+ * @see form_example_tutorial_10_validate()
+ * @ingroup form_example
+ */
+function form_example_tutorial_10($form_state) {
+  // If you are familiar with how browsers handle files, you know that
+  // enctype="multipart/form-data" is required. Drupal takes care of that, so
+  // you don't need to include it yourself.
+
+  $form['file'] = array(
+    '#type'        => 'file',
+    '#title'       => t('Image'),
+    '#description' => t('Upload a file, allowed extensions: jpg, jpeg, png, gif'),
+  );
+
+  $form['submit'] = array(
+    '#type'  => 'submit',
+    '#value' => t('Submit'),
+  );
+
+  return $form;
+}
+
+
+/**
+ * Validate handler for form_example_tutorial_10().
+ */
+// Even if you put 'svg' in file_validate_extensions, the file_validate_is_image
+// will still kick out a .svg file.
+function form_example_tutorial_10_validate($form, &$form_state) {
+  $file = file_save_upload('file', array(
+    'file_validate_is_image'   => array(),                   // Validates file is really an image.
+    'file_validate_extensions' => array('png gif jpg jpeg'), // Validate extensions.
+  ));
+  // If the file passed validation:
+  if ($file) {
+    // Move the file, into the Drupal file system
+    if ($file = file_move($file, 'public://')) {
+      // Save the file for use in the submit handler.
+      $form_state['storage']['file'] = $file;
+    }
+    else {
+      form_set_error('file', t('Failed to write the uploaded file the site\'s file folder.'));
+    }
+  }
+  else {
+    form_set_error('file', t('No file was uploaded.'));
+  }
+}
+
+
+/**
+ * Submit handler for form_example_tutorial_10().
+ */
+function form_example_tutorial_10_submit($form, &$form_state) {
+  $file = $form_state['storage']['file'];
+  // We are done with the file, remove it from storage.
+  unset($form_state['storage']['file']);
+  // Make the storage of the file permanent
+  $file->status = FILE_STATUS_PERMANENT;
+  // Save file status.
+  file_save($file);
+  // Set a response to the user.
+  drupal_set_message(t('The form has been submitted and the image has been saved, filename: @filename.', array('@filename' => $file->filename)));
+}
