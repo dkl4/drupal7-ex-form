@@ -266,3 +266,56 @@ function form_example_wizard_location_info_validate($form, &$form_state) {
     form_set_error('city', t('You were warned not to enter "San Francisco"'));
   }
 }
+
+
+/**
+ * Returns form elements for the 'other info' page of the wizard. This is the
+ * thid and last step of the example wizard.
+ *
+ * @ingroup form_example
+ */
+function form_example_wizard_other_info($form, &$form_state) {
+  $form = array();
+  $form['aunts_name'] = array(
+    '#type'          => 'textfield',
+    '#title'         => t("Your first cousin's aunt's Social Security number"),
+    '#default_value' => !empty($form_state['values']['aunts_name']) ? $form_state['values']['aunts_name'] : '',
+  );
+  return $form;
+}
+
+// And now comes the magic of the wizard, the function that should handle all the
+// inputs from the user on each different step.
+/**
+ * Wizard form submit handler.
+ * - Saves away $form_state['values']
+ * - Process all the form values.
+ *
+ * This demonstration handler just does a drupal_set_message() with the information
+ * collected on each different step of the wizard.
+ *
+ * @param $form
+ * @param $form_state
+ *
+ * @ingroup form_example
+ */
+function form_example_wizard_submit($form, &$form_state) {
+  $current_step = &$form_state['step'];
+  $form_state['step_information'][$current_step]['stored_values'] = $form_state['values'];
+
+  // In this case we've completed the final page of the wizard, so process the
+  // submitted information.
+  drupal_set_message(t('This information was collected by this wizard:'));
+  foreach ($form_state['step_information'] as $index => $value) {
+    // Remove FAPI fields included in the values (form_token, form_id and form_build_id
+    // This is not required, you may access the values using $value['stored_values']
+    // but I'm removing them to make a more clear representation of the collected
+    // information as the complete array will be passed through drupal_set_message().
+    unset($value['stored_values']['form_id']);
+    unset($value['stored_values']['form_build_id']);
+    unset($value['stored_values']['form_token']);
+
+    // Now show all the values.
+    drupal_set_message(t('Step @num collected the following values: <pre>@result</pre>', array('@num' => $index, '@result' => print_r($value['stored_values'], TRUE))));
+  }
+}
