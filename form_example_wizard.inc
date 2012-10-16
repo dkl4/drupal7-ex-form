@@ -198,3 +198,71 @@ function form_example_wizard_next_submit($form, &$form_state) {
   }
 }
 
+/**
+ * The previous code was a 'skeleton' of a multistep wizard form. You are not
+ * required to change a line on the previous code (apart from defining your own
+ * steps in the _form_example_steps() function.
+ *
+ * All the code included from here is the content of the wizard, the steps of
+ * the form.
+ *
+ * First, let's show the defined steps for the wizard example.
+ * @ingroup form_example
+ */
+
+/**
+ * Returns form elements for the 'personal info' page of the wizard. This is the
+ * first step of the wizard, asking for two textfields: first name and last
+ * name.
+ *
+ * @ingroup form_example
+ */
+function form_example_wizard_personal_info($form, &$form_state) {
+  $form = array();
+  $form['first_name'] = array(
+    '#type'          => 'textfield',
+    '#title'         => t('First Name'),
+    '#default_value' => !empty($form_state['values']['first_name']) ? $form_state['values']['first_name'] : '',
+  );
+  $form['last_name'] = array(
+    '#type'          => 'textfield',
+    '#title'         => t('Last Name'),
+    '#default_value' => !empty($form_state['values']['last_name']) ? $form_state['values']['last_name'] : '',
+  );
+  return $form;
+}
+
+
+/**
+ * Returns form elements for the 'location info' page of the wizard. This is the
+ * second step of the wizard. This step asks for a textfield value: a City. This
+ * step also includes a validation declared later.
+ *
+ * @ingroup form_example
+ */
+function form_example_wizard_location_info($form, &$form_state) {
+  $form = array();
+  $form['city'] = array(
+    '#type'          => 'textfield',
+    '#title'         => t('City'),
+    '#description'   => t('Hint: Do not enter "San Francisco", and do not leave this out.'),
+    '#required'      => TRUE,
+    '#default_value' => !empty($form_state['values']['city']) ? $form_state['values']['city'] : '',
+
+  );
+  return $form;
+}
+
+/**
+ * Custom validation form for the 'location info' page of the wizard.
+ *
+ * This is the validation function for the second step of the wizard.
+ * The city cannot be empty or be "San Francisco".
+ *
+ * @ingroup form_example
+ */
+function form_example_wizard_location_info_validate($form, &$form_state) {
+  if ($form_state['values']['city'] == 'San Francisco') {
+    form_set_error('city', t('You were warned not to enter "San Francisco"'));
+  }
+}
