@@ -282,6 +282,85 @@ function form_example_phonenumber_discrete_validate($element, &$form_state) {
 }
 
 
+/**
+ * Process callback for the combined version of the phonenumber element.
+ */
+function form_example_phonenumber_combined_process($element, &$form_state, $complete_form) {
+  // #tree = TRUE means that the values in $form_state['values'] will be stored
+  // hierarchically. In this case, the parts of the element will appear in
+  // $form_state['values'] as
+  // $form_state['values']['<element_name>']['areacode'],
+  // $form_state['values']['<element_name>']['prefix'],
+  // etc. This technique is preferred when an element has member form
+  // elements.
+
+  $element['#tree'] = TRUE;
+
+  // Normal FAPI field definitions, except that #value is defined.
+  $element['areacode'] = array(
+    '#type' => 'textfield',
+    '#size' => 3,
+    '#maxlength' => 3,
+    '#required' => TRUE,
+    '#prefix' => '(',
+    '#suffix' => ')',
+  );
+  $element['prefix'] =  array(
+    '#type' => 'textfield',
+    '#size' => 3,
+    '#maxlength' => 3,
+    '#required' => TRUE,
+  );
+  $element['extension'] =  array(
+    '#type' => 'textfield',
+    '#size' => 4,
+    '#maxlength' => 4,
+    '#required' => TRUE,
+  );
+
+  $matches = array();
+  $match = preg_match('/^(\d{3})(\d{3})(\d{4})$/', $element['#default_value'], $matches);
+  if ($match) {
+    array_shift($matches); // get rid of the "all match" element
+    list($element['areacode']['#default_value'], $element['prefix']['#default_value'], $element['extension']['#default_value']) = $matches;
+  }
+
+  return $element;
+}
+
+
+/**
+ * Phone number validation function for the combined phonenumber.
+ *
+ * Uses regular expressions to check that:
+ *  - the area code is a three digit number
+ *  - the prefix is numeric 3-digit number
+ *  - the extension is a numeric 4-digit number
+ *
+ * Any problems are shown on the form element using form_error().
+ *
+ * The combined value is then updated in the element.
+ */
+function form_example_phonenumber_combined_validate($element, &$form_state) {
+  $lengths = array(
+    'areacode' => 3,
+    'prefix' => 3,
+    'extension' => 4,
+  );
+  foreach ($lengths as $member => $length) {
+    $regex = '/^\d{' . $length . '}$/';
+    if (!empty($element['#value'][$member]) && 0 == preg_match($regex, $element['#value'][$member])) {
+      form_error($element[$member], t('@member is invalid', array('@member' => $member)));
+    }
+  }
+
+  // Consolidate into the three parts into one combined value.
+  $value = $element['areacode']['#value'] . $element['prefix']['#value'] . $element['extension']['#value'];
+  form_set_value($element, $value, $form_state);
+  return $element;
+}
+
+
 
 /**
  * Called by form_example_theme() to provide hook_theme().
