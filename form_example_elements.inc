@@ -52,6 +52,183 @@
  */
 
 
+/**
+ * Utility function providing data for form_example_element_info().
+ *
+ * This defines several new form element types.
+ *
+ * - form_example_textfield: This is actually just a textfield, but provides
+ *   the new type. If more were to be done with it a theme function could be
+ *   provided.
+ * - form_example_checkbox: Nothing more than a regular checkbox, but uses
+ *   an alternate theme function provided by this module.
+ * - form_example_phonenumber_discrete: Provides a North-American style
+ *   three-part phonenumber where the value of the phonenumber is managed
+ *   as an array of three parts.
+ * - form_example_phonenumber_combined: Provides a North-American style
+ *   three-part phonenumber where the actual value is managed as a 10-digit
+ *   string and only broken up into three parts for the user interface.
+ *
+ * form_builder() has significant discussion of #process and #value_callback.
+ * See also hook_element_info().
+ *
+ * system_element_info() contains the Drupal default element types, which can
+ * also be used as examples.
+ */
+function _form_example_element_info() {
+  // form_example_textfield is a trivial element based on textfield that
+  // requires only a definition and a theme function. In this case we provide
+  // the theme function using the parent "textfield" theme function, but it
+  // would by default be provided in hook_theme(), by a "form_example_textfield"
+  // theme implementation, provided by default by the function
+  // theme_form_example_textfield().  Note that the 'form_example_textfield'
+  // element type is completely defined here. There is no further code required
+  // for it.
+  $types['form_example_textfield'] = array(
+    // #input = TRUE means that the incoming value will be used to figure out
+    // what #value will be.
+    '#input' => TRUE,
+
+    // Use theme('textfield') to format this element on output.
+    '#theme' => array('textfield'),
+
+    // Do not provide autocomplete.
+    '#autocomplete_path' => FALSE,
+
+    // Allow theme('form_element') to control the markup surrounding this
+    // value on output.
+    '#theme_wrappers' => array('form_element'),
+  );
+
+
+  // form_example_checkbox is mostly a copy of the system-defined checkbox
+  // element.
+  $types['form_example_checkbox'] = array(
+    '#input'        => TRUE,  // This is an HTML <input>.
+
+    // @todo: Explain #return_value.
+    '#return_value' => TRUE,
+
+    // Our #process array will use the standard process functions used for a
+    // regular checkbox.
+    '#process' => array('form_process_checkbox', 'ajax_process_form'),
+
+    // Use theme('form_example_checkbox') to render this element on output.
+    // theme_form_example_checkbox() is defined below
+    '#theme'   => 'form_example_checkbox',
+
+    // Use theme('form_element') to provide HTML wrappers for this element.
+    '#theme_wrappers' => array('form_element'),
+
+    // Place the title after the element (to the right of the checkbox).
+    // This attribute affects the behavior of theme_form_element().
+    '#title_display'  => 'after',
+
+    // We use the default function name for the value callback, so it does not
+    // have to be listed explicitly. The pattern for the default function name
+    // is form_type_TYPENAME_value().
+    // '#value_callback' => 'form_type_form_example_checkbox_value',
+  );
+
+  // This discrete phonenumber element keeps its values as the separate elements
+  // area code, prefix, extension.
+  $types['form_example_phonenumber_discrete'] = array(
+    // #input == TRUE means that the form value here will be used to determine
+    // what #value will be.
+    '#input'   => TRUE,
+
+    // #process is an array of callback functions executed when this element is
+    // processed. Here it provides the child form elements which define
+    // areacode, prefix, and extension.
+    // Function form_example_phonenumber_discrete_process() is defined below
+    '#process' => array('form_example_phonenumber_discrete_process'),
+
+    // validation handlers for this element. These are in addition to any
+    // validation handlers that might
+    '#element_validate'  => array('form_example_phonenumber_discrete_validate'),
+    '#autocomplete_path' => FALSE,
+    '#theme_wrappers'    => array('form_example_inline_form_element'),
+  );
+
+  // Define form_example_phonenumber_combined, which combines the phone
+  // number into a single validated text string.
+  $types['form_example_phonenumber_combined'] = array(
+    '#input'             => TRUE ,
+    '#process'           => array('form_example_phonenumber_combined_process'),
+    '#element_validate'  => array('form_example_phonenumber_combined_validate'),
+    '#autocomplete_path' => FALSE,
+    '#value_callback'    => 'form_example_phonenumber_combined_value',
+    '#default_value'     => array(
+      'areacode'  => '',
+      'prefix'    => '',
+      'extension' => '',
+    ),
+    '#theme_wrappers'    => array('form_example_inline_form_element'),
+  );
+  return $types;
+}
+
+
+
+/**
+ * Formats child form elements as inline elements.
+ */
+function theme_form_example_inline_form_element($variables) {
+  $element = $variables['element'];
+
+  // Add element #id for #type 'item'.
+  if (isset($element['#markup']) && !empty($element['#id'])) {
+    $attributes['id'] = $element['#id'];
+  }
+  // Add element's #type and #name as class to aid with JS/CSS selectors.
+  $attributes['class'] = array('form-item');
+  if (!empty($element['#type'])) {
+    $attributes['class'][] = 'form-type-' . strtr($element['#type'], '_', '-');
+  }
+  if (!empty($element['#name'])) {
+    $attributes['class'][] = 'form-item-' . strtr($element['#name'], array(' ' => '-', '_' => '-', '[' => '-', ']' => ''));
+  }
+  // Add a class for disabled elements to facilitate cross-browser styling.
+  if (!empty($element['#attributes']['disabled'])) {
+    $attributes['class'][] = 'form-disabled';
+  }
+  $output = '<div' . drupal_attributes($attributes) . '>' . "\n";
+
+  // If #title is not set, we don't display any label or required marker.
+  if (!isset($element['#title'])) {
+    $element['#title_display'] = 'none';
+  }
+  $prefix = isset($element['#field_prefix']) ? '<span class="field-prefix">' . $element['#field_prefix'] . '</span> ' : '';
+  $suffix = isset($element['#field_suffix']) ? '<span class="field-suffix">' . $element['#field_suffix'] . '</span> ' : '';
+
+  switch ($element['#title_display']) {
+    case 'before':
+      $output .= ' ' . theme('form_element_label', $variables);
+      $output .= ' ' . '<div class="container-inline">' . $prefix . $element['#children'] . $suffix . "</div>\n";
+      break;
+
+    case 'invisible':
+    case 'after':
+      $output .= ' ' . $prefix . $element['#children'] . $suffix;
+      $output .= ' ' . theme('form_element_label', $variables) . "\n";
+      break;
+
+    case 'none':
+    case 'attribute':
+      // Output no label and no required marker, only the children.
+      $output .= ' ' . $prefix . $element['#children'] . $suffix . "\n";
+      break;
+  }
+
+  if (!empty($element['#description'])) {
+    $output .= ' <div class="description">' . $element['#description'] . "</div>\n";
+  }
+
+  $output .= "</div>\n";
+
+  return $output;
+}
+
 
 
 
