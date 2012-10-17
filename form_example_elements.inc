@@ -169,6 +169,49 @@ function _form_example_element_info() {
 }
 
 
+/**
+ * Builds the current combined value of the phone number only when the form
+ * builder is not processing the input.
+ *
+ * @param $element
+ * @param $input
+ * @param $form_state
+ *
+ * @return array
+ */
+function  form_example_phonenumber_combined_value(&$element, $input = FALSE, $form_state = NULL) {
+  if (!$form_state['process_input']) {
+    $matches = array();
+    $match = preg_match('/^(\d{3})(\d{3})(\d{4})$/', $element['#default_value'], $matches);
+    if ($match) {
+      array_shift($matches); // get rid of the "all match" element
+      list($element['areacode'], $element['prefix'], $element['extension']) = $matches;
+    }
+  }
+  return $element;
+}
+
+
+/**
+ * Value callback for form_example_checkbox element type.
+ * Copied from form_type_checkbox_value().
+ *
+ * @param $element
+ *   The form element whose value is being populated.
+ * @param $input
+ *   The incoming input to populate the form element. If this is FALSE, meaning
+ *   there is no input, the element's default value should be returned.
+ */
+function form_type_form_example_checkbox_value($element, $input = FALSE) {
+  if ($input === FALSE) {
+    return isset($element['#default_value']) ? $element['#default_value'] : 0;
+  }
+  else {
+    return isset($input) ? $element['#return_value'] : 0;
+  }
+}
+
+
 
 /**
  * Formats child form elements as inline elements.
