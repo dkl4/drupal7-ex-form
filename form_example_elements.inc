@@ -212,6 +212,77 @@ function form_type_form_example_checkbox_value($element, $input = FALSE) {
 }
 
 
+/**
+ * Process callback for the discrete version of phonenumber.
+ */
+function form_example_phonenumber_discrete_process($element, &$form_state, $complete_form) {
+  // #tree = TRUE means that the values in $form_state['values'] will be stored
+  // hierarchically. In this case, the parts of the element will appear in
+  // $form_state['values'] as
+  // $form_state['values']['<element_name>']['areacode'],
+  // $form_state['values']['<element_name>']['prefix'],
+  // etc. This technique is preferred when an element has member form
+  // elements.
+  $element['#tree'] = TRUE;
+
+  // Normal FAPI field definitions, except that #value is defined.
+  $element['areacode'] = array(
+    '#type'      => 'textfield',
+    '#size'      => 3,
+    '#maxlength' => 3,
+    '#value'     => $element['#value']['areacode'],
+    '#required'  => TRUE,
+    '#prefix'    => '(',
+    '#suffix'    => ')',
+  );
+  $element['prefix'] =  array(
+    '#type'      => 'textfield',
+    '#size'      => 3,
+    '#maxlength' => 3,
+    '#required'  => TRUE,
+    '#value'     => $element['#value']['prefix'],
+  );
+  $element['extension'] =  array(
+    '#type'      => 'textfield',
+    '#size'      => 4,
+    '#maxlength' => 4,
+    '#value'     => $element['#value']['extension'],
+  );
+
+  return $element;
+}
+
+/**
+ * Validation handler for the discrete version of the phone number.
+ *
+ * Uses regular expressions to check that:
+ *  - the area code is a three digit number.
+ *  - the prefix is numeric 3-digit number.
+ *  - the extension is a numeric 4-digit number.
+ *
+ * Any problems are shown on the form element using form_error().
+ */
+function form_example_phonenumber_discrete_validate($element, &$form_state) {
+  if (isset($element['#value']['areacode'])) {
+    if (0 == preg_match('/^\d{3}$/', $element['#value']['areacode'])) {
+      form_error($element['areacode'], t('The area code is invalid.'));
+    }
+  }
+  if (isset($element['#value']['prefix'])) {
+    if (0 == preg_match('/^\d{3}$/', $element['#value']['prefix'])) {
+      form_error($element['prefix'], t('The prefix is invalid.'));
+    }
+  }
+  if (isset($element['#value']['extension'])) {
+    if (0 == preg_match('/^\d{4}$/', $element['#value']['extension'])) {
+      form_error($element['extension'], t('The extension is invalid.'));
+    }
+  }
+  return $element;
+}
+
+
+
 
 /**
  * Formats child form elements as inline elements.
