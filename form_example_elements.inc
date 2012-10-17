@@ -283,6 +283,36 @@ function form_example_phonenumber_discrete_validate($element, &$form_state) {
 
 
 
+/**
+ * Called by form_example_theme() to provide hook_theme().
+ *
+ * This is kept in this file so it can be with the theme functions it presents.
+ * Otherwise it would get lonely.
+ */
+function _form_example_element_theme() {
+  return array(
+    'form_example_inline_form_element' => array(
+      'render element' => 'element',
+      'file' => 'form_example_elements.inc',
+    ),
+    'form_example_checkbox' => array(
+      'render element' => 'element',
+      'file' => 'form_example_elements.inc',
+    ),
+  );
+}
+
+/**
+ * Themes a custom checkbox.
+ *
+ * This doesn't actually do anything, but is here to show that theming can
+ * be done here.
+ */
+function theme_form_example_checkbox($variables) {
+  $element = $variables['element'];
+  return theme('checkbox', $element);
+}
+
 
 /**
  * Formats child form elements as inline elements.
